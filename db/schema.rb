@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_22_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_17_050055) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -222,6 +222,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_090000) do
     t.index ["feature_key", "key", "value"], name: "index_flipper_gates_on_feature_key_and_key_and_value", unique: true
   end
 
+  create_table "fog_of_war_tiles", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "h3_index", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id", "h3_index"], name: "index_fog_of_war_tiles_on_user_id_and_h3_index", unique: true
+    t.index ["user_id"], name: "index_fog_of_war_tiles_on_user_id"
+  end
+
   create_table "imports", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "user_id", null: false
@@ -358,6 +367,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_090000) do
     t.jsonb "motion_data", default: {}, null: false
     t.decimal "altitude_decimal", precision: 10, scale: 2
     t.boolean "anomaly"
+    t.datetime "fog_of_war_calculated_at"
     t.index ["id"], name: "index_points_on_not_reverse_geocoded", where: "(reverse_geocoded_at IS NULL)"
     t.index ["import_id"], name: "index_points_on_import_id"
     t.index ["lonlat", "timestamp", "user_id"], name: "index_points_on_lonlat_timestamp_user_id", unique: true
@@ -621,6 +631,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_22_090000) do
   add_foreign_key "family_memberships", "families"
   add_foreign_key "family_memberships", "users"
   add_foreign_key "flights", "users"
+  add_foreign_key "fog_of_war_tiles", "users"
   add_foreign_key "notes", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "pending_imports", "users", column: "claimed_by_user_id", on_delete: :nullify
