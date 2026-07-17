@@ -11,7 +11,7 @@ class EnqueueBackgroundJob < ApplicationJob
       Import::PhotoprismGeodataJob.perform_later(user_id)
     when 'start_airtrail_import'
       AirTrail::ImportFlightsJob.perform_later(user_id)
-    when 'start_reverse_geocoding', 'continue_reverse_geocoding'
+    when 'start_reverse_geocoding', 'continue_reverse_geocoding', 'start_fog_of_war_calculation'
       Jobs::Create.new(job_name, user_id).call
     else
       raise ArgumentError, "Unknown job name: #{job_name}"

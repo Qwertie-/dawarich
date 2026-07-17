@@ -40,6 +40,16 @@
       </div>
     </div>
 
+    <div class="card bg-base-300 w-96 shadow-xl m-5">
+      <div class="card-body">
+        <h2 class="card-title">Start Fog of War Calculation</h2>
+        <p>This job will re-run the fog of war calculation for all the points in your database. Might take a few days or even weeks based on the amount of points you have!</p>
+        <div class="card-actions justify-end">
+          <%= link_to 'Start Job', settings_background_jobs_path(job_name: 'start_fog_of_war_calculation'), data: { turbo_confirm: 'Are you sure?', turbo_method: :post }, class: 'btn btn-primary' %>
+        </div>
+      </div>
+    </div>
+
     <% if current_user.admin? %>
       <div class="card bg-base-300 w-96 shadow-xl m-5">
         <div class="card-body">

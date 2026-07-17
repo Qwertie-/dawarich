@@ -20,6 +20,8 @@ class Jobs::Create
       bulk_enqueue(user.points, force: true)
     when 'continue_reverse_geocoding'
       bulk_enqueue(user.points.not_reverse_geocoded, force: false)
+    when 'start_fog_of_war_calculation'
+      bulk_enqueue_fog_of_war(user.points.where(fog_of_war_calculated_at: nil))
     else
       raise InvalidJobName, 'Invalid job name'
     end
@@ -42,6 +44,16 @@ class Jobs::Create
         clear_dedup_keys(ids) unless force
         raise
       end
+    end
+  end
+
+  def bulk_enqueue_fog_of_war(points_relation)
+    points_relation.in_batches(of: BULK_ENQUEUE_BATCH_SIZE) do |batch|
+      ids = batch.pluck(:id)
+      next if ids.empty?
+
+      jobs = ids.map { |id| FogOfWarTileJob.new(id) }
+      ActiveJob.perform_all_later(jobs)
     end
   end
 
